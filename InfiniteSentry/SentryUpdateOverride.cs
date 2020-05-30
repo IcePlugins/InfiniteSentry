@@ -11,6 +11,8 @@ namespace ExtraConcentratedJuice.InfiniteSentry
     {
         public const int AMMO_INDEX = 10;
 
+        private static bool HasWeapon(InteractableSentry Sentry) => (bool)InfiniteSentry.HasWeapon.GetValue(Sentry);
+
         internal static void Prefix(ref byte __state, InteractableSentry __instance)
         {
             SentryTrackerComponent s = __instance.gameObject.GetComponent<SentryTrackerComponent>();
@@ -19,7 +21,7 @@ namespace ExtraConcentratedJuice.InfiniteSentry
                 return;
 
             Item disp = __instance.displayItem;
-            bool wep = (bool)typeof(InteractableSentry).GetField("hasWeapon", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(__instance);
+            bool wep = HasWeapon(__instance);
 
             if (disp != null && wep)
                 __state = disp.state[AMMO_INDEX];

@@ -28,9 +28,10 @@ namespace ExtraConcentratedJuice.InfiniteSentry
 
         public void Execute(IRocketPlayer caller, string[] args)
         {
+            SteamPlayer steamPlayer = PlayerTool.getSteamPlayer(ulong.Parse(caller.Id));
             if (InfiniteSentry.Instance.Configuration.Instance.allSentriesInfinite)
             {
-                UnturnedChat.Say(caller, InfiniteSentry.Instance.Translate("disabled"), Color.red);
+                InfiniteSentry.Instance.TellPlayer(steamPlayer, Color.red, "disabled");
                 return;
             }
 
@@ -39,29 +40,34 @@ namespace ExtraConcentratedJuice.InfiniteSentry
 
             if (PhysicsUtility.raycast(new Ray(look.aim.position, look.aim.forward), out RaycastHit hit, Mathf.Infinity, RayMasks.BARRICADE | RayMasks.STRUCTURE))
             {
-                var sentry = hit.transform?.GetComponent<InteractableSentry>();
-
+                // https://github.com/JetBrains/resharper-unity/wiki/Possible-unintended-bypass-of-lifetime-check-of-underlying-Unity-engine-object
+                if (hit.transform == null)
+                {
+                    InfiniteSentry.Instance.TellPlayer(steamPlayer, Color.red, "no_sentry");
+                    return;
+                }
+            
+                var sentry = hit.transform.GetComponent<InteractableSentry>();
                 if (sentry == null)
                 {
-                    UnturnedChat.Say(caller, InfiniteSentry.Instance.Translate("no_sentry"), Color.red);
+                    InfiniteSentry.Instance.TellPlayer(steamPlayer, Color.red, "no_sentry");
                     return;
                 }
 
                 var component = sentry.gameObject.GetComponent<SentryTrackerComponent>();
-
                 if (component == null)
                 {
-                    UnturnedChat.Say(caller, InfiniteSentry.Instance.Translate("added"));
+                    InfiniteSentry.Instance.TellPlayer(steamPlayer, Palette.SERVER, "added");
                     sentry.gameObject.AddComponent<SentryTrackerComponent>();
                 }
                 else
                 {
                     UnityEngine.Object.Destroy(component);
-                    UnturnedChat.Say(caller, InfiniteSentry.Instance.Translate("destroyed"));
+                    InfiniteSentry.Instance.TellPlayer(steamPlayer, Palette.SERVER, "destroyed");
                 }
             }
             else
-                UnturnedChat.Say(caller, InfiniteSentry.Instance.Translate("no_sentry"), Color.red);
+                InfiniteSentry.Instance.TellPlayer(steamPlayer, Color.red, "no_sentry");
         }
     }
 }

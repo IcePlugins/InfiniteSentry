@@ -1,12 +1,10 @@
-﻿using Harmony;
+﻿using HarmonyLib;
 using Rocket.Core.Plugins;
 using SDG.Unturned;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
 using Rocket.API.Collections;
+using UnityEngine;
+using Logger = Rocket.Core.Logging.Logger;
 
 namespace ExtraConcentratedJuice.InfiniteSentry
 {
@@ -15,6 +13,8 @@ namespace ExtraConcentratedJuice.InfiniteSentry
         public static InfiniteSentry Instance { get; private set; }
         public bool ShuttingDown { get; private set; }
 
+        public static FieldInfo HasWeapon;
+
         protected override void Load()
         {
             Instance = this;
@@ -22,17 +22,24 @@ namespace ExtraConcentratedJuice.InfiniteSentry
             Provider.onServerShutdown += OnShutdown;
             Level.onPostLevelLoaded += OnLevelLoaded;
 
-            HarmonyInstance harmony = HarmonyInstance.Create("pw.cirno.extraconcentratedjuice");
+            HasWeapon = typeof(InteractableSentry).GetField("hasWeapon",
+                BindingFlags.NonPublic | BindingFlags.Instance);
+
+            Harmony harmony = new Harmony("pw.cirno.extraconcentratedjuice");
 
             var orig = typeof(InteractableSentry).GetMethod("Update", BindingFlags.Instance | BindingFlags.NonPublic);
             var pre = typeof(SentryUpdateOverride).GetMethod("Prefix", BindingFlags.Static | BindingFlags.NonPublic);
             var post = typeof(SentryUpdateOverride).GetMethod("Postfix", BindingFlags.Static | BindingFlags.NonPublic);
 
             harmony.Patch(orig, new HarmonyMethod(pre), new HarmonyMethod(post));
+            
+            Logger.Log("Documentation available at: https://iceplugins.xyz/InfiniteSentry/");
         }
 
         protected override void Unload()
         {
+            Instance.Configuration.Save();
+            
             Provider.onServerShutdown -= OnShutdown;
             Level.onPostLevelLoaded -= OnLevelLoaded;
         }
@@ -52,14 +59,21 @@ namespace ExtraConcentratedJuice.InfiniteSentry
 
                     InteractableSentry s = drop.interactable as InteractableSentry;
 
-                    if (s != null)
-                    {
-                        foreach (SentryPosition pos in Configuration.Instance.sentries)
-                            if (pos.Equals(s.transform.position))
-                                s.gameObject.AddComponent<SentryTrackerComponent>();
-                    }
+                    if (s == null) 
+                        continue;
+                    
+                    // Consider using reverse for loop here. SentryTrackerComponent can modify collection
+                    // Using foreach will cause an exception to be thrown if/when this happens
+                    foreach (SentryPosition pos in Configuration.Instance.sentries)
+                        if (pos.CompareVector3(s.transform.position))
+                            s.gameObject.AddComponent<SentryTrackerComponent>();
                 }
         }
+
+        public void TellPlayer(SteamPlayer recipient, Color color, string translationKey,
+            params object[] translationParameters) =>
+            ChatManager.serverSendMessage(Instance.Translate(translationKey, translationParameters), color,
+                toPlayer: recipient);
 
         public override TranslationList DefaultTranslations =>
             new TranslationList
