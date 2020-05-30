@@ -19,17 +19,8 @@ namespace ExtraConcentratedJuice.InfiniteSentry
             Z = z;
         }
 
-        public override bool Equals(object obj)
-        {
-            if (obj is Vector3 vec)
-                return X == vec.x && Y == vec.y && Z == vec.z;
-
-            if (obj is SentryPosition pos)
-                return X == pos.X && Y == pos.Y && Z == pos.Z;
-
-            return false;
-        }
-            
+        // Overriding Equals and not GetHashCode will cause inconsistencies
+        public bool CompareVector3(Vector3 position) => X == position.x && Y == position.y && Z == position.z;
 
         public SentryPosition() { }
     }

@@ -14,11 +14,10 @@ namespace ExtraConcentratedJuice.InfiniteSentry
             Vector3 pos = transform.position;
             SentryPosition newPos = new SentryPosition(pos.x, pos.y, pos.z);
 
-            if (!InfiniteSentry.Instance.Configuration.Instance.sentries.Any(x => x.Equals(newPos)))
-            {
-                InfiniteSentry.Instance.Configuration.Instance.sentries.Add(newPos);
-                InfiniteSentry.Instance.Configuration.Save();
-            }
+            if (InfiniteSentry.Instance.Configuration.Instance.sentries.Any(x => x.CompareVector3(pos)))
+                return;
+            
+            InfiniteSentry.Instance.Configuration.Instance.sentries.Add(newPos);
         }
 
         public void OnDisable()
@@ -27,13 +26,12 @@ namespace ExtraConcentratedJuice.InfiniteSentry
                 return;
 
             SentryPosition pos = InfiniteSentry.Instance.Configuration.Instance.sentries.FirstOrDefault(x =>
-                x.Equals(transform.position));
+                x.CompareVector3(transform.position));
 
-            if (pos != null)
-            {
-                InfiniteSentry.Instance.Configuration.Instance.sentries.Remove(pos);
-                InfiniteSentry.Instance.Configuration.Save();
-            }
+            if (pos == null)
+                return;
+            
+            InfiniteSentry.Instance.Configuration.Instance.sentries.Remove(pos);
         }
     }
 }
