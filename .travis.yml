@@ -1,0 +1,13 @@
+language: csharp
+solution: InfiniteSentry.sln
+deploy:
+  provider: releases
+  edge: true
+  api_key:
+    secure: Kc273/Bry5p5FG7bSNM+EnYLVxurb5wU7tr+ymaQRO/xvcq9SNezG5mOIppi7ldLNumfM2Fe9cHV3C9ET/XHmijcu0+5xeCxQlNNfstWdKOrsX7ZbFUxF5ZFTgpLHdx/fVo+iXNTYbMA+MW4E0+Gw5TVRUPqu1ULvZTDT3qUqcQ6YqtjqNi0/qzzydswI0HrNFueRTVS2sF5iFMv4+vQ29/kBAjER2X4knap+KrTugV2iX6iM3vq7463Q0NlOzoSa5cjj2GPLF9sS55+Tflo5W3YLmSpIfSdgq8R4V/gcKx1Fx8BLQ40MQIHvyk1q0h1KT//zHhbosVn7HTNwrkVZdu/IZIP5Sf1H39uSMKInoyL4J3QioUTR3k63wwE8dgvqdl9Oq52OgqKNJNz5bjA/werLMPl2/L73T3q5/bPJiPwxttAO1jWlIc7AUx9IIQhTF5RiBpwIhf7KxyjeHgrXJEKY6kgWQ5RQJKsBUyAT08h6m9jnW8uoKISv34kMXxAiUSR5E73vnlujRqmkwL788g59Y86A76Po+Sp/kpwEq5VJavA9y4Tu9TAF7Ijajb1gUhjn0gGQrxqqCZKkDEsFhniX5y+GeCJWaeOA5EMaVvA0v079s1Y+n3GX8KIVswtXFIWYhZIFrwEZKZJ1+zDL7LrypuxIwJVETrMGfMNRn0=
+  file: 'InfiniteSentry/bin/Release/InfiniteSentry.dll'
+  on:
+    tags: true
+  skip_cleanup: true
+  release_notes: 'This is an automated build of the plugin from Travis-CI.\nRefer to https://iceplugins.xyz/InfiniteSentry/ for documentation.'
+  draft: false
