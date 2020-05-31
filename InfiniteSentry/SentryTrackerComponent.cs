@@ -18,6 +18,7 @@ namespace ExtraConcentratedJuice.InfiniteSentry
                 return;
             
             InfiniteSentry.Instance.Configuration.Instance.sentries.Add(newPos);
+            InfiniteSentry.Instance.ChangedConfig = true;
         }
 
         public void OnDisable()
@@ -32,6 +33,7 @@ namespace ExtraConcentratedJuice.InfiniteSentry
                 return;
             
             InfiniteSentry.Instance.Configuration.Instance.sentries.Remove(pos);
+            InfiniteSentry.Instance.ChangedConfig = true;
         }
     }
 }

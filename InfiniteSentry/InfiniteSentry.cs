@@ -12,13 +12,14 @@ namespace ExtraConcentratedJuice.InfiniteSentry
     {
         public static InfiniteSentry Instance { get; private set; }
         public bool ShuttingDown { get; private set; }
-
         public static FieldInfo HasWeapon;
-
+        public bool ChangedConfig;
+        
         protected override void Load()
         {
             Instance = this;
             ShuttingDown = false;
+            ChangedConfig = false;
             Provider.onServerShutdown += OnShutdown;
             Level.onPostLevelLoaded += OnLevelLoaded;
 
@@ -38,7 +39,8 @@ namespace ExtraConcentratedJuice.InfiniteSentry
 
         protected override void Unload()
         {
-            Instance.Configuration.Save();
+            if (ChangedConfig)
+                Instance.Configuration.Save();
             
             Provider.onServerShutdown -= OnShutdown;
             Level.onPostLevelLoaded -= OnLevelLoaded;
